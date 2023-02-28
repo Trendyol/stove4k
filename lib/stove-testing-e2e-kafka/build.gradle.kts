@@ -10,4 +10,5 @@ dependencies {
 
 dependencies {
     testImplementation(libs.slf4j.simple)
+    testImplementation(project(":lib:stove-testing-e2e-kafka-proxy"))
 }

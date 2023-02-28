@@ -38,7 +38,12 @@ import kotlin.time.Duration.Companion.milliseconds
 
 data class KafkaExposedConfiguration(
     val boostrapServers: String,
-) : ExposedConfiguration
+    val host: String,
+    val ports: List<Int>,
+    val firstMappedPort: Int,
+) : ExposedConfiguration {
+    val communicationPort: Int = boostrapServers.removePrefix("PLAINTEXT://").split(":")[1].toInt()
+}
 
 data class KafkaSystemOptions(
     val registry: String = DEFAULT_REGISTRY,
@@ -112,7 +117,12 @@ class KafkaSystem(
 
     override suspend fun run() {
         context.container.start()
-        exposedConfiguration = KafkaExposedConfiguration(context.container.bootstrapServers)
+        exposedConfiguration = KafkaExposedConfiguration(
+            context.container.bootstrapServers,
+            context.container.host,
+            context.container.exposedPorts,
+            context.container.firstMappedPort
+        )
         adminClient = createAdminClient(exposedConfiguration)
         kafkaProducer = createProducer(exposedConfiguration)
     }

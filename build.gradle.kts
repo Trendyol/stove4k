@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage", "DSL_SCOPE_VIOLATION")
 
 import org.jetbrains.dokka.gradle.DokkaMultiModuleTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm").version(libs.versions.kotlin)
@@ -49,7 +50,7 @@ subprojectsOf("lib", "spring", "examples", "ktor") {
             useJUnitPlatform()
         }
 
-        withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        withType<KotlinCompile> {
             dependsOn(ktlintCheck)
             kotlinOptions.jvmTarget = "16"
             kotlinOptions.allWarningsAsErrors = true

@@ -3,6 +3,7 @@ package com.trendyol.stove.testing.e2e.kafka.setup
 import com.trendyol.stove.testing.e2e.kafka.KafkaSystemOptions
 import com.trendyol.stove.testing.e2e.kafka.StoveKafkaValueDeserializer
 import com.trendyol.stove.testing.e2e.kafka.StoveKafkaValueSerializer
+import com.trendyol.stove.testing.e2e.kafka.proxy.ProxyServer
 import com.trendyol.stove.testing.e2e.kafka.setup.example.KafkaTestShared
 import com.trendyol.stove.testing.e2e.kafka.withKafka
 import com.trendyol.stove.testing.e2e.system.TestSystem
@@ -71,7 +72,11 @@ class ProjectConfig : AbstractProjectConfig(), BeforeEachListener, AfterEachList
                 KafkaSystemOptions(
                     // ports = listOf(9094, 9095),
                     configureExposedConfiguration = { cfg ->
-                        listOf("kafka.servers=${cfg.boostrapServers}")
+                        Thread {
+                            ProxyServer(8080, cfg.host, cfg.communicationPort).work()
+                        }.start()
+                        // listOf("kafka.servers=${cfg.boostrapServers}")
+                        listOf("kafka.servers=PLAINTEXT://localhost:8080")
                     }
                 )
             )

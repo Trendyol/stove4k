@@ -7,6 +7,7 @@ include(
     "lib:stove-testing-e2e-wiremock",
     "lib:stove-testing-e2e-http",
     "lib:stove-testing-e2e-kafka",
+    "lib:stove-testing-e2e-kafka-proxy",
     "lib:stove-testing-e2e-couchbase",
     "lib:stove-testing-e2e-rdbms",
     "lib:stove-testing-e2e-rdbms-postgres",
