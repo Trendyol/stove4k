@@ -25,6 +25,8 @@ r2dbc-spi = "1.0.0.RELEASE"
 r2dbc-postgresql = "0.8.13.RELEASE"
 elastic = "8.6.2"
 mongodb = "4.9.0"
+netty = "4.1.89.Final"
+avro = "1.11.1"
 
 [libraries]
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
@@ -66,6 +68,8 @@ r2dbc-spi = { module = "io.r2dbc:r2dbc-spi", version.ref = "r2dbc-spi" }
 r2dbc-postgresql = { module = "io.r2dbc:r2dbc-postgresql", version.ref = "r2dbc-postgresql" }
 elastic = { module = "co.elastic.clients:elasticsearch-java", version.ref = "elastic" }
 mongodb-reactivestreams = { module = "org.mongodb:mongodb-driver-reactivestreams", version.ref = "mongodb" }
+netty-all = { module = "io.netty:netty-all", version.ref = "netty" }
+apache-avro = { module = "org.apache.avro:avro", version.ref = "avro" }
 
 [plugins]
 spring-plugin = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }

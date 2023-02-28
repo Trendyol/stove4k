@@ -73,7 +73,7 @@ class ProjectConfig : AbstractProjectConfig(), BeforeEachListener, AfterEachList
                     // ports = listOf(9094, 9095),
                     configureExposedConfiguration = { cfg ->
                         Thread {
-                            ProxyServer(8080, cfg.host, cfg.communicationPort).work()
+                            ProxyServer(8080, cfg.host, cfg.communicationPort).startProxy2()
                         }.start()
                         // listOf("kafka.servers=${cfg.boostrapServers}")
                         listOf("kafka.servers=PLAINTEXT://localhost:8080")

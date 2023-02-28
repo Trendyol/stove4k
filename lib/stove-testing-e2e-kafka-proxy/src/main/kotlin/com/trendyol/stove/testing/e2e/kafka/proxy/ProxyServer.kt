@@ -1,21 +1,40 @@
 package com.trendyol.stove.testing.e2e.kafka.proxy
 
+import com.trendyol.stove.functional.Try
+import io.netty.bootstrap.ServerBootstrap
+import io.netty.channel.ChannelInitializer
+import io.netty.channel.nio.NioEventLoopGroup
+import io.netty.channel.socket.nio.NioServerSocketChannel
+import org.apache.kafka.common.protocol.ApiKeys
+import org.apache.kafka.common.protocol.ApiKeys.API_VERSIONS
+import org.apache.kafka.common.requests.AbstractRequest
+import org.slf4j.Logger
 import java.net.InetSocketAddress
 import java.nio.ByteBuffer
-import java.nio.channels.SelectionKey
-import java.nio.channels.Selector
-import java.nio.channels.ServerSocketChannel
-import java.nio.channels.SocketChannel
-import org.slf4j.Logger
+import java.nio.channels.*
 
 class ProxyServer(
-    val onPort: Int = 8080,
-    val targetHost: String,
-    val targetPort: Int,
+    private val onPort: Int = 8080,
+    private val targetHost: String,
+    private val targetPort: Int,
 ) {
 
     private val logger: Logger = org.slf4j.LoggerFactory.getLogger(javaClass)
-    fun work() {
+
+    fun startProxy1() {
+        val upstreamAddress = InetSocketAddress(targetHost, targetPort)
+        ServerBootstrap()
+            .group(NioEventLoopGroup(), NioEventLoopGroup())
+            .channel(NioServerSocketChannel::class.java)
+            .childHandler(object : ChannelInitializer<io.netty.channel.socket.SocketChannel>() {
+                override fun initChannel(ch: io.netty.channel.socket.SocketChannel) {
+                    ch.pipeline().addLast(KafkaPacketDecoder(), KafkaPacketForwarder(upstreamAddress))
+                }
+            })
+            .bind(InetSocketAddress("localhost", onPort)).sync()
+    }
+
+    fun startProxy2() {
         val selector = Selector.open()
         val serverChannel = ServerSocketChannel.open()
         serverChannel.bind(InetSocketAddress("localhost", onPort))
@@ -59,9 +78,13 @@ class ProxyServer(
 
                         // Forward the data to the other socket
                         val outputBuffer = ByteBuffer.wrap(bytes)
-                        logger.info(
-                            String(outputBuffer.array(), Charsets.US_ASCII)
-                        )
+                        ApiKeys.values()
+                            .map {
+                                Try { AbstractRequest.parseRequest(it, API_VERSIONS.latestVersion(), outputBuffer.asReadOnlyBuffer()) }
+                                    .map {
+                                        logger.info(it.request.toString(true))
+                                    }
+                            }
                         destinationChannel.write(outputBuffer)
                     }
                 }
